@@ -132,6 +132,7 @@ set(CMAKE_CXX_STANDARD 11 CACHE STRING "C++ standard version to use (default is 
 
 ## GEOS custom variables
 option(BUILD_BENCHMARKS "Build GEOS benchmarks" OFF)
+option(BUILD_THREAD_SAFE "Build the library with thread safety guarantees" ON)
 cmake_dependent_option(GEOS_BUILD_DEVELOPER
   "Build with compilation flags useful for development" ON
   "GEOS_BUILD_FROM_GIT;PROJECT_IS_TOP_LEVEL" OFF)
@@ -269,7 +270,10 @@ option(VERSION_MINGW_SHARED_LIBS "Add version suffix to MinGW shared libraries" 
 
 if(BUILD_SHARED_LIBS)
   target_compile_definitions(geos
-    PRIVATE $<IF:$<CXX_COMPILER_ID:MSVC>,GEOS_DLL_EXPORT,DLL_EXPORT>)
+    PRIVATE
+      $<IF:$<CXX_COMPILER_ID:MSVC>,GEOS_DLL_EXPORT,DLL_EXPORT>
+    PUBLIC
+      $<$<BOOL:${BUILD_THREAD_SAFE}>:GEOS_BUILD_THREAD_SAFE>)
 
   set_target_properties(geos PROPERTIES VERSION ${GEOS_VERSION_NOPATCH})
   set_target_properties(geos PROPERTIES SOVERSION ${GEOS_VERSION_NOPATCH})

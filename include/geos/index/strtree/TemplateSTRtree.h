@@ -27,7 +27,10 @@
 
 #include <vector>
 #include <queue>
+
+#ifdef GEOS_BUILD_THREAD_SAFE
 #include <mutex>
+#endif
 
 namespace geos {
 namespace index {
@@ -342,7 +345,9 @@ public:
 
     /** Build the tree if it has not already been built. */
     void build() {
+        #ifdef GEOS_BUILD_THREAD_SAFE
         std::lock_guard<std::mutex> lock(lock_);
+        #endif
 
         if (built()) {
             return;
@@ -375,7 +380,9 @@ public:
     }
 
 protected:
+    #ifdef GEOS_BUILD_THREAD_SAFE
     std::mutex lock_;
+    #endif
     NodeList nodes;      //**< a list of all leaf and branch nodes in the tree. */
     Node* root;          //**< a pointer to the root node, if the tree has been built. */
     size_t nodeCapacity; //*< maximum number of children of each node */
